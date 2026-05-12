@@ -275,6 +275,13 @@
     letter-spacing: 0.02em;
   }
 
+  .btn-import {
+    background: var(--surface);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .btn-import:hover { border-color: var(--green); color: var(--green); }
+
   .btn-export { background: var(--text); color: #fff; }
   .btn-export:hover { background: var(--accent); }
 
@@ -386,6 +393,11 @@
 </div>
 
 <div class="actions-bar">
+  <button class="btn btn-import" onclick="document.getElementById('import-input').click()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Importer CSV
+  </button>
+  <input type="file" id="import-input" accept=".csv" style="display:none" onchange="importCSV(event)">
   <button class="btn btn-print" onclick="window.print()">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
     Imprimer
@@ -556,6 +568,115 @@
     a.download = `calcul_journee_${slug}_${rempl.replace(/\s+/g,'_')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const text = e.target.result;
+      // Normalize line endings, split lines
+      const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+
+      // Parse a CSV line respecting quoted fields
+      function parseLine(line) {
+        const result = [];
+        let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const c = line[i];
+          if (c === '"') { inQ = !inQ; }
+          else if (c === ';' && !inQ) { result.push(cur.trim()); cur = ''; }
+          else { cur += c; }
+        }
+        result.push(cur.trim());
+        return result;
+      }
+
+      let dateVal = '', rempl = '', dataRows = [];
+      let headerFound = false;
+
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) continue;
+        const cols = parseLine(line);
+
+        // Detect meta lines
+        if (cols[0] === 'Date:' && cols[1]) { dateVal = cols[1]; continue; }
+        if (cols[0] === 'Remplacante:' && cols[1]) { rempl = cols[1]; continue; }
+
+        // Detect header row
+        if (cols[0] === 'Patient') { headerFound = true; continue; }
+
+        // Skip non-data lines
+        if (!headerFound) continue;
+        if (!cols[0] || cols[0] === 'TOTAL' || cols[0].startsWith('A PAYER')) continue;
+
+        // Data row: Patient ; BSI ; nb_deplac ; total_deplac ; net ; pct
+        const patient = cols[0].replace(/^"|"$/g, '');
+        const bsi     = parseFloat((cols[1] || '0').replace(',', '.')) || 0;
+        const nb      = parseFloat((cols[2] || '0').replace(',', '.')) || 0;
+        if (patient || bsi || nb) dataRows.push({ patient, bsi, nb });
+      }
+
+      // Restore date
+      if (dateVal) {
+        // detect period (contains " au ")
+        if (dateVal.includes(' au ')) {
+          const parts = dateVal.split(' au ');
+          setMode('period');
+          document.getElementById('date-start').value = isoDate(parts[0].trim());
+          document.getElementById('date-end').value   = isoDate(parts[1].trim());
+        } else {
+          setMode('single');
+          document.getElementById('date-start').value = isoDate(dateVal.trim());
+        }
+      }
+
+      if (rempl) document.getElementById('remplacante').value = rempl;
+
+      // Clear existing rows and populate
+      document.getElementById('table-body').innerHTML = '';
+      rowCount = 0;
+
+      if (dataRows.length === 0) {
+        addRow(); addRow(); addRow();
+      } else {
+        dataRows.forEach(({ patient, bsi, nb }) => {
+          rowCount++;
+          const tbody = document.getElementById('table-body');
+          const tr = document.createElement('tr');
+          tr.dataset.id = rowCount;
+          tr.innerHTML = `
+            <td><button class="delete-btn" onclick="removeRow(${rowCount})" title="Supprimer">\xd7</button></td>
+            <td><input type="text" placeholder="Nom du patient" onchange="recalc()"></td>
+            <td><input type="number" step="0.01" min="0" placeholder="0,00" oninput="recalc()"></td>
+            <td><input type="number" step="1" min="0" placeholder="0" oninput="recalc()"></td>
+            <td class="computed" id="td-dep-${rowCount}">\u2014</td>
+            <td class="computed" id="td-net-${rowCount}">\u2014</td>
+            <td class="computed col-pct" id="td-pct-${rowCount}">\u2014</td>
+          `;
+          tbody.appendChild(tr);
+          const ins = tr.querySelectorAll('input');
+          ins[0].value = patient;
+          ins[1].value = bsi || '';
+          ins[2].value = nb  || '';
+        });
+        recalc();
+      }
+
+      // Reset file input so same file can be re-imported
+      event.target.value = '';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  // Convert dd/mm/yyyy → yyyy-mm-dd
+  function isoDate(fr) {
+    if (!fr) return '';
+    const parts = fr.split('/');
+    if (parts.length !== 3) return '';
+    return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
   }
 
   addRow(); addRow(); addRow();
