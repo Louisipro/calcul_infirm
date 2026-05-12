@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calcul Journée</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ed;
+    --surface: #ffffff;
+    --surface2: #faf8f5;
+    --border: #e2ddd6;
+    --accent: #c8432a;
+    --text: #1a1714;
+    --muted: #8a8278;
+    --green: #2a7a4f;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 20px 60px;
+  }
+
+  header {
+    max-width: 1100px;
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .header-left .subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .header-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  input[type="date"], input[type="text"] {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="date"] { min-width: 148px; }
+  input[type="text"] { min-width: 180px; }
+  input[type="date"]:focus, input[type="text"]:focus { border-color: var(--accent); }
+
+  .date-mode-toggle {
+    display: flex;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .date-mode-toggle button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 7px 13px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+
+  .date-mode-toggle button.active { background: var(--text); color: #fff; }
+
+  .date-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .date-sep {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .main-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .table-wrapper { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+  thead tr { background: var(--text); color: #fff; }
+
+  thead th {
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  thead th:first-child { padding-left: 20px; }
+  thead th:last-child { padding-right: 20px; }
+  .col-accent { color: #ffb899; }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td { padding: 10px 12px; vertical-align: middle; }
+  tbody td:first-child { padding-left: 20px; }
+  tbody td:last-child { padding-right: 20px; }
+
+  td input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    width: 100%;
+    padding: 3px 0;
+  }
+
+  td input:focus { border-bottom: 1.5px solid var(--accent); }
+  td input[type="number"] { -moz-appearance: textfield; }
+  td input[type="number"]::-webkit-inner-spin-button,
+  td input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .computed { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .computed.negative { color: var(--accent); }
+  .computed.positive { color: var(--green); }
+  .col-pct { font-weight: 600; color: var(--green); font-size: 0.925rem; }
+
+  .add-row-row td { padding: 8px 20px; background: var(--surface2); }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+  tfoot tr.totals-row { background: var(--surface2); border-top: 2px solid var(--border); }
+
+  tfoot tr.final-row { background: var(--text); }
+
+  tfoot td { padding: 13px 12px; font-weight: 600; font-size: 0.875rem; }
+  tfoot td:first-child { padding-left: 20px; }
+  tfoot td:last-child { padding-right: 20px; }
+
+  .total-label { font-family: 'DM Serif Display', serif; font-size: 1rem; }
+  .total-val { font-variant-numeric: tabular-nums; font-size: 1rem; }
+  .total-pct { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--green); }
+
+  .final-row td { color: #fff; }
+
+  .final-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    color: #ffb899;
+    text-align: right;
+    padding-right: 16px;
+  }
+
+  .final-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    display: block;
+  }
+
+  .final-formula {
+    font-size: 0.68rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    color: rgba(255,255,255,0.4);
+    display: block;
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+
+  .actions-bar {
+    max-width: 1100px;
+    margin: 20px auto 0;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-export { background: var(--text); color: #fff; }
+  .btn-export:hover { background: var(--accent); }
+
+  .btn-print {
+    background: var(--surface);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .btn-print:hover { border-color: var(--text); }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--border);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s;
+    display: flex;
+    align-items: center;
+  }
+  .delete-btn:hover { color: var(--accent); }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .btn-add, .btn, .actions-bar, .delete-btn { display: none !important; }
+    .main-card { box-shadow: none; border: 1px solid #ccc; }
+    header { margin-bottom: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Calcul Journée</h1>
+    <p class="subtitle">Béatrice Petrus — Infirmière Libérale</p>
+  </div>
+  <div class="header-controls">
+
+    <div class="field-group">
+      <label>Période</label>
+      <div class="date-mode-toggle">
+        <button id="btn-single" class="active" onclick="setMode('single')">Journée</button>
+        <button id="btn-period" onclick="setMode('period')">Période</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label id="date-label">Date</label>
+      <div class="date-row">
+        <input type="date" id="date-start">
+        <span class="date-sep" id="date-sep" style="display:none">au</span>
+        <input type="date" id="date-end" style="display:none">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Remplaçante</label>
+      <input type="text" id="remplacante" placeholder="Nom de la remplaçante">
+    </div>
+
+  </div>
+</header>
+
+<div class="main-card">
+  <div class="table-wrapper">
+    <table id="main-table">
+      <thead>
+        <tr>
+          <th style="width:30px"></th>
+          <th>Patient</th>
+          <th>BSI + IFI (€)</th>
+          <th>Déplacements</th>
+          <th>Total Dépl. (€)</th>
+          <th class="col-accent">BSI − Déplac (€)</th>
+          <th class="col-accent">5%</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+      <tr class="add-row-row">
+        <td colspan="7">
+          <button class="btn-add" onclick="addRow()">＋ Ajouter un patient</button>
+        </td>
+      </tr>
+      <tfoot>
+        <tr class="totals-row">
+          <td></td>
+          <td class="total-label">TOTAL</td>
+          <td class="total-val computed" id="total-bsi">0,00 €</td>
+          <td></td>
+          <td class="total-val computed" id="total-deplac">0,00 €</td>
+          <td class="total-val computed" id="total-net">0,00 €</td>
+          <td class="total-pct" id="total-pct">0,00 €</td>
+        </tr>
+        <tr class="final-row">
+          <td colspan="5"></td>
+          <td class="final-label">À PAYER</td>
+          <td>
+            <span class="final-val" id="total-final">0,00 €</span>
+            <span class="final-formula">Total BSI+IFI − 5% + Déplacements</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="actions-bar">
+  <button class="btn btn-print" onclick="window.print()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimer
+  </button>
+  <button class="btn btn-export" onclick="exportCSV()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Exporter CSV
+  </button>
+</div>
+
+<script>
+  const DEPLAC_UNIT = 2.75;
+  let rowCount = 0;
+  let currentMode = 'single';
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('date-start').value = today;
+  document.getElementById('date-end').value = today;
+
+  function setMode(mode) {
+    currentMode = mode;
+    const sep = document.getElementById('date-sep');
+    const end = document.getElementById('date-end');
+    const lbl = document.getElementById('date-label');
+    document.getElementById('btn-single').classList.toggle('active', mode === 'single');
+    document.getElementById('btn-period').classList.toggle('active', mode === 'period');
+    if (mode === 'single') {
+      sep.style.display = 'none';
+      end.style.display = 'none';
+      lbl.textContent = 'Date';
+    } else {
+      sep.style.display = 'inline';
+      end.style.display = 'inline-block';
+      lbl.textContent = 'Du';
+    }
+  }
+
+  function getDateLabel() {
+    const start = document.getElementById('date-start').value;
+    if (currentMode === 'single') return fmtDate(start);
+    const end = document.getElementById('date-end').value;
+    return `${fmtDate(start)} au ${fmtDate(end)}`;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function fmt(n) {
+    return n.toFixed(2).replace('.', ',') + ' \u20ac';
+  }
+
+  function addRow() {
+    rowCount++;
+    const tbody = document.getElementById('table-body');
+    const tr = document.createElement('tr');
+    tr.dataset.id = rowCount;
+    tr.innerHTML = `
+      <td><button class="delete-btn" onclick="removeRow(${rowCount})" title="Supprimer">\xd7</button></td>
+      <td><input type="text" placeholder="Nom du patient" onchange="recalc()"></td>
+      <td><input type="number" step="0.01" min="0" placeholder="0,00" oninput="recalc()"></td>
+      <td><input type="number" step="1" min="0" placeholder="0" oninput="recalc()"></td>
+      <td class="computed" id="td-dep-${rowCount}">\u2014</td>
+      <td class="computed" id="td-net-${rowCount}">\u2014</td>
+      <td class="computed col-pct" id="td-pct-${rowCount}">\u2014</td>
+    `;
+    tbody.appendChild(tr);
+    tr.querySelector('input[type="text"]').focus();
+    recalc();
+  }
+
+  function removeRow(id) {
+    const tr = document.querySelector(`tr[data-id="${id}"]`);
+    if (tr) tr.remove();
+    recalc();
+  }
+
+  function recalc() {
+    const rows = document.querySelectorAll('#table-body tr[data-id]');
+    let totalBSI = 0, totalDeplac = 0, totalNet = 0, totalPct = 0;
+
+    rows.forEach(tr => {
+      const id  = tr.dataset.id;
+      const ins = tr.querySelectorAll('input[type="number"]');
+      const bsi = parseFloat(ins[0].value) || 0;
+      const nb  = parseFloat(ins[1].value) || 0;
+      const dep = nb * DEPLAC_UNIT;
+      const net = bsi - dep;
+      const pct = net * 0.05;
+
+      document.getElementById(`td-dep-${id}`).textContent = nb > 0 ? fmt(dep) : '\u2014';
+
+      const netEl = document.getElementById(`td-net-${id}`);
+      netEl.textContent = (bsi > 0 || nb > 0) ? fmt(net) : '\u2014';
+      netEl.className   = 'computed' + (net < 0 ? ' negative' : net > 0 ? ' positive' : '');
+
+      document.getElementById(`td-pct-${id}`).textContent = (bsi > 0 || nb > 0) ? fmt(pct) : '\u2014';
+
+      totalBSI    += bsi;
+      totalDeplac += dep;
+      totalNet    += net;
+      totalPct    += pct;
+    });
+
+    // À PAYER = total BSI+IFI − 5% + total déplacements
+    const finalTotal = totalBSI - totalPct + totalDeplac;
+
+    document.getElementById('total-bsi').textContent    = fmt(totalBSI);
+    document.getElementById('total-deplac').textContent = fmt(totalDeplac);
+    document.getElementById('total-net').textContent    = fmt(totalNet);
+    document.getElementById('total-pct').textContent    = fmt(totalPct);
+    document.getElementById('total-final').textContent  = fmt(finalTotal);
+  }
+
+  function exportCSV() {
+    const dateLabel = getDateLabel();
+    const rempl     = document.getElementById('remplacante').value || 'N/A';
+    const rows      = document.querySelectorAll('#table-body tr[data-id]');
+
+    const header = ['Patient','BSI + IFI (EUR)','Deplacements (nb)','Total Deplacements (EUR)','BSI - Deplac (EUR)','5%'];
+    const lines  = [
+      '"Calcul Journee"',
+      `"Date:","${dateLabel}"`,
+      `"Remplacante:","${rempl}"`,
+      '"Infirmiere:","Beatrice Petrus"',
+      '',
+      header.join(';')
+    ];
+
+    rows.forEach(tr => {
+      const ins     = tr.querySelectorAll('input');
+      const patient = ins[0].value || '';
+      const bsi     = parseFloat(ins[1].value) || 0;
+      const nb      = parseFloat(ins[2].value) || 0;
+      const dep     = nb * DEPLAC_UNIT;
+      const net     = bsi - dep;
+      const pct     = net * 0.05;
+      lines.push([
+        `"${patient}"`,
+        bsi.toFixed(2).replace('.', ','),
+        nb,
+        dep.toFixed(2).replace('.', ','),
+        net.toFixed(2).replace('.', ','),
+        pct.toFixed(2).replace('.', ',')
+      ].join(';'));
+    });
+
+    lines.push('');
+    lines.push([
+      '"TOTAL"',
+      document.getElementById('total-bsi').textContent.replace(' \u20ac',''),
+      '',
+      document.getElementById('total-deplac').textContent.replace(' \u20ac',''),
+      document.getElementById('total-net').textContent.replace(' \u20ac',''),
+      document.getElementById('total-pct').textContent.replace(' \u20ac','')
+    ].join(';'));
+
+    lines.push('');
+    lines.push(`"A PAYER (BSI+IFI - 5% + Deplacements)";;;;;${document.getElementById('total-final').textContent.replace(' \u20ac','')}`);
+
+    const slug = dateLabel.replace(/\//g,'-').replace(/\s/g,'_');
+    const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `calcul_journee_${slug}_${rempl.replace(/\s+/g,'_')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  addRow(); addRow(); addRow();
+</script>
+</body>
+</html>
