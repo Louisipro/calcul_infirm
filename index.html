@@ -4,62 +4,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calcul Journée</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f2ed;
-    --surface: #ffffff;
-    --surface2: #faf8f5;
-    --border: #e2ddd6;
-    --accent: #c8432a;
-    --text: #1a1714;
-    --muted: #8a8278;
-    --green: #2a7a4f;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-    --radius: 10px;
+    --bg:        #f0ede8;
+    --surface:   #ffffff;
+    --surface2:  #f7f5f2;
+    --surface3:  #efecea;
+    --border:    #ddd9d2;
+    --border2:   #cac5bd;
+    --accent:    #c8432a;
+    --accent-bg: #fdf1ee;
+    --text:      #1a1714;
+    --text2:     #4a4540;
+    --muted:     #9a9288;
+    --green:     #1e6b3f;
+    --green-bg:  #eaf3ee;
+    --blue:      #1a5fa8;
+    --blue-bg:   #eaf1fb;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow:    0 4px 20px rgba(0,0,0,0.08);
+    --r:         12px;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 32px 20px 60px;
+    padding: 36px 24px 72px;
   }
 
-  header {
-    max-width: 1100px;
-    margin: 0 auto 32px;
+  /* ── HEADER ───────────────────────────────────────────── */
+  .page-header {
+    max-width: 1160px;
+    margin: 0 auto 28px;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 20px;
     flex-wrap: wrap;
   }
 
-  .header-left h1 {
+  .header-brand { display: flex; align-items: center; gap: 14px; }
+
+  .header-icon {
+    width: 46px; height: 46px;
+    background: var(--text);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-icon svg { display: block; }
+
+  .header-brand h1 {
     font-family: 'DM Serif Display', serif;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: 1.75rem;
     letter-spacing: -0.02em;
     line-height: 1;
+    color: var(--text);
   }
 
-  .header-left .subtitle {
-    font-size: 0.85rem;
+  .header-brand .subtitle {
+    font-size: 0.72rem;
     color: var(--muted);
-    margin-top: 4px;
-    font-weight: 300;
-    letter-spacing: 0.04em;
+    font-weight: 500;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
+    margin-top: 3px;
   }
 
-  .header-controls {
+  /* ── CONTROLS CARD ────────────────────────────────────── */
+  .controls-card {
+    max-width: 1160px;
+    margin: 0 auto 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+    padding: 18px 20px;
     display: flex;
-    gap: 12px;
+    gap: 20px;
     flex-wrap: wrap;
     align-items: flex-end;
+  }
+
+  .ctrl-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+    margin: 0 4px;
   }
 
   .field-group {
@@ -68,75 +105,80 @@
     gap: 5px;
   }
 
-  label {
-    font-size: 0.7rem;
-    font-weight: 600;
+  .field-label {
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--muted);
   }
-
-  input[type="date"], input[type="text"] {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    padding: 8px 12px;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input[type="date"] { min-width: 148px; }
-  input[type="text"] { min-width: 180px; }
-  input[type="date"]:focus, input[type="text"]:focus { border-color: var(--accent); }
 
   .date-mode-toggle {
     display: flex;
     border: 1.5px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 8px;
     overflow: hidden;
-    background: var(--surface);
+    background: var(--surface2);
   }
 
   .date-mode-toggle button {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    padding: 7px 13px;
+    padding: 7px 14px;
     border: none;
     background: transparent;
     color: var(--muted);
     cursor: pointer;
-    transition: all 0.18s;
+    transition: all 0.16s;
     white-space: nowrap;
   }
 
-  .date-mode-toggle button.active { background: var(--text); color: #fff; }
-
-  .date-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+  .date-mode-toggle button.active {
+    background: var(--text);
+    color: #fff;
+    border-radius: 6px;
+    margin: 1px;
   }
 
+  .date-row { display: flex; align-items: center; gap: 8px; }
+
   .date-sep {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: var(--muted);
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
 
+  input[type="date"], input[type="text"] {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    padding: 8px 11px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  input[type="date"] { min-width: 145px; }
+  input[type="text"] { min-width: 200px; }
+
+  input[type="date"]:focus, input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,67,42,0.1);
+  }
+
+  /* ── MAIN TABLE CARD ──────────────────────────────────── */
   .main-card {
-    max-width: 1100px;
+    max-width: 1160px;
     margin: 0 auto;
     background: var(--surface);
-    border-radius: 16px;
+    border-radius: var(--r);
     box-shadow: var(--shadow);
     overflow: hidden;
     border: 1px solid var(--border);
@@ -144,33 +186,71 @@
 
   .table-wrapper { overflow-x: auto; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  table { width: 100%; border-collapse: collapse; }
 
-  thead tr { background: var(--text); color: #fff; }
+  /* Column group headers */
+  .col-group-header {
+    background: var(--surface3);
+    border-bottom: 1px solid var(--border);
+  }
 
-  thead th {
-    padding: 14px 12px;
-    text-align: left;
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.06em;
+  .col-group-header th {
+    padding: 6px 12px;
+    font-size: 0.62rem;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-align: center;
+    border-right: 1px solid var(--border);
     white-space: nowrap;
   }
 
-  thead th:first-child { padding-left: 20px; }
-  thead th:last-child { padding-right: 20px; }
-  .col-accent { color: #ffb899; }
+  .col-group-header th:first-child { border-left: none; }
+  .col-group-header th:last-child { border-right: none; }
+  .col-group-header th.grp-identity { text-align: left; padding-left: 16px; }
+  .col-group-header th.grp-input { background: var(--blue-bg); color: var(--blue); }
+  .col-group-header th.grp-calc { background: var(--accent-bg); color: var(--accent); }
 
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  /* Column headers row */
+  thead tr.col-headers { background: var(--text); }
+
+  thead tr.col-headers th {
+    padding: 11px 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,0.07);
+  }
+
+  thead tr.col-headers th:first-child { padding-left: 16px; color: transparent; }
+  thead tr.col-headers th:last-child { border-right: none; padding-right: 16px; }
+  thead tr.col-headers th.col-input-h { color: #a8c8f8; }
+  thead tr.col-headers th.col-calc-h { color: #ffb899; }
+
+  /* Body rows */
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--surface2); }
+  tbody tr:hover { background: #faf8f6; }
+  tbody td {
+    padding: 9px 12px;
+    vertical-align: middle;
+    border-right: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
 
-  tbody td { padding: 10px 12px; vertical-align: middle; }
-  tbody td:first-child { padding-left: 20px; }
-  tbody td:last-child { padding-right: 20px; }
+  tbody td:first-child { padding-left: 12px; border-left: none; width: 36px; }
+  tbody td:last-child { border-right: none; padding-right: 16px; }
 
-  td input {
+  td input[type="text"], td input[type="number"] {
     font-family: 'DM Sans', sans-serif;
     font-size: 0.875rem;
     border: none;
@@ -178,201 +258,293 @@
     background: transparent;
     color: var(--text);
     width: 100%;
-    padding: 3px 0;
+    padding: 2px 0;
   }
 
-  td input:focus { border-bottom: 1.5px solid var(--accent); }
+  td input[type="text"]:focus,
+  td input[type="number"]:focus {
+    border-bottom: 1.5px solid var(--accent);
+  }
+
   td input[type="number"] { -moz-appearance: textfield; }
   td input[type="number"]::-webkit-inner-spin-button,
   td input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
-  .computed { font-variant-numeric: tabular-nums; font-weight: 500; }
+/* Computed cells */
+  .computed {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--text2);
+    font-size: 0.875rem;
+  }
+
   .computed.negative { color: var(--accent); }
   .computed.positive { color: var(--green); }
-  .col-pct { font-weight: 600; color: var(--green); font-size: 0.925rem; }
 
-  .add-row-row td { padding: 8px 20px; background: var(--surface2); }
+  .col-pct {
+    font-weight: 700;
+    color: var(--green);
+    font-size: 0.9rem;
+  }
+
+  /* Add row */
+  .add-row-row td {
+    padding: 10px 16px;
+    background: var(--surface2);
+    border-right: none !important;
+  }
 
   .btn-add {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 600;
     color: var(--muted);
     background: none;
-    border: 1.5px dashed var(--border);
-    border-radius: 6px;
+    border: 1.5px dashed var(--border2);
+    border-radius: 7px;
     padding: 6px 14px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.18s;
+    letter-spacing: 0.02em;
   }
 
-  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
 
-  tfoot tr.totals-row { background: var(--surface2); border-top: 2px solid var(--border); }
+  /* Totals row */
+  tfoot tr.totals-row {
+    background: var(--surface3);
+    border-top: 2px solid var(--border2);
+  }
 
+  tfoot td {
+    padding: 11px 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-right: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+
+  tfoot td:first-child { padding-left: 12px; border-left: none; }
+  tfoot td:last-child { border-right: none; padding-right: 16px; }
+
+  .total-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 0.95rem;
+    color: var(--text2);
+    letter-spacing: 0.01em;
+  }
+
+  .total-val { color: var(--text); }
+  .total-pct { color: var(--green); font-size: 0.95rem; }
+
+  /* Final "À payer" row */
   tfoot tr.final-row { background: var(--text); }
 
-  tfoot td { padding: 13px 12px; font-weight: 600; font-size: 0.875rem; }
-  tfoot td:first-child { padding-left: 20px; }
-  tfoot td:last-child { padding-right: 20px; }
+  tfoot tr.final-row td { border-right-color: rgba(255,255,255,0.08); }
+  tfoot tr.final-row td:last-child { border-right: none; }
 
-  .total-label { font-family: 'DM Serif Display', serif; font-size: 1rem; }
-  .total-val { font-variant-numeric: tabular-nums; font-size: 1rem; }
-  .total-pct { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--green); }
+  .final-spacer { background: var(--text) !important; }
 
-  .final-row td { color: #fff; }
+  .final-label-cell {
+    text-align: right;
+    padding-right: 14px !important;
+  }
 
   .final-label {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1rem;
-    letter-spacing: 0.03em;
-    color: #ffb899;
-    text-align: right;
-    padding-right: 16px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    display: block;
+    margin-bottom: 2px;
   }
+
+  .final-sublabel {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.25);
+    font-weight: 400;
+    display: block;
+    letter-spacing: 0.02em;
+    font-style: italic;
+  }
+
+  .final-amount-cell { vertical-align: middle !important; }
 
   .final-val {
     font-family: 'DM Serif Display', serif;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-variant-numeric: tabular-nums;
     color: #fff;
     display: block;
+    line-height: 1;
   }
 
-  .final-formula {
-    font-size: 0.68rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 400;
-    color: rgba(255,255,255,0.4);
+  .final-note {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.3);
     display: block;
-    margin-top: 2px;
-    letter-spacing: 0.03em;
+    margin-top: 3px;
+    font-style: italic;
   }
 
-  .actions-bar {
-    max-width: 1100px;
-    margin: 20px auto 0;
+  /* Delete button */
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--border2);
+    font-size: 15px;
+    line-height: 1;
+    padding: 3px;
+    border-radius: 5px;
+    transition: all 0.15s;
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    align-items: center;
   }
+  .delete-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  /* ── ACTIONS BAR ──────────────────────────────────────── */
+  .actions-bar {
+    max-width: 1160px;
+    margin: 16px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actions-left, .actions-right { display: flex; gap: 8px; }
 
   .btn {
     display: inline-flex;
     align-items: center;
     gap: 7px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
-    padding: 10px 20px;
-    border-radius: var(--radius);
+    padding: 9px 18px;
+    border-radius: 9px;
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
+    transition: all 0.18s;
     letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 
   .btn-import {
     background: var(--surface);
-    color: var(--text);
+    color: var(--text2);
     border: 1.5px solid var(--border);
   }
-  .btn-import:hover { border-color: var(--green); color: var(--green); }
+  .btn-import:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
 
-  .btn-export { background: var(--text); color: #fff; }
-  .btn-export:hover { background: var(--accent); }
+  .btn-export {
+    background: var(--text);
+    color: #fff;
+  }
+  .btn-export:hover { background: #2e2a26; }
 
   .btn-pdf {
-    background: var(--surface);
-    color: var(--text);
-    border: 1.5px solid var(--border);
+    background: var(--accent);
+    color: #fff;
   }
-  .btn-pdf:hover { border-color: var(--accent); color: var(--accent); }
-
-  .delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--border);
-    font-size: 1rem;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: color 0.15s;
-    display: flex;
-    align-items: center;
-  }
-  .delete-btn:hover { color: var(--accent); }
+  .btn-pdf:hover { background: #a8391f; }
 
   @media print {
     body { background: white; padding: 0; }
-    .btn-add, .btn, .actions-bar, .delete-btn { display: none !important; }
+    .btn-add, .btn, .actions-bar, .delete-btn, .controls-card { display: none !important; }
     .main-card { box-shadow: none; border: 1px solid #ccc; }
-    header { margin-bottom: 20px; }
+    .page-header { margin-bottom: 20px; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-left">
-    <h1>Calcul Journée</h1>
-    <p class="subtitle">Béatrice Petrus — Infirmière Libérale</p>
-  </div>
-  <div class="header-controls">
-
-    <div class="field-group">
-      <label>Période</label>
-      <div class="date-mode-toggle">
-        <button id="btn-single" class="active" onclick="setMode('single')">Journée</button>
-        <button id="btn-period" onclick="setMode('period')">Période</button>
-      </div>
+<!-- HEADER -->
+<header class="page-header">
+  <div class="header-brand">
+    <div class="header-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
     </div>
-
-    <div class="field-group">
-      <label id="date-label">Date</label>
-      <div class="date-row">
-        <input type="date" id="date-start">
-        <span class="date-sep" id="date-sep" style="display:none">au</span>
-        <input type="date" id="date-end" style="display:none">
-      </div>
+    <div>
+      <h1>Calcul Journée</h1>
+      <p class="subtitle">Béatrice Petrus &mdash; Infirmière Libérale</p>
     </div>
-
-    <div class="field-group">
-      <label>Remplaçante</label>
-      <input type="text" id="remplacante" placeholder="Nom de la remplaçante">
-    </div>
-
   </div>
 </header>
 
+<!-- CONTROLS -->
+<div class="controls-card">
+
+  <div class="field-group">
+    <span class="field-label">Période</span>
+    <div class="date-mode-toggle">
+      <button id="btn-single" class="active" onclick="setMode('single')">Journée</button>
+      <button id="btn-period" onclick="setMode('period')">Période</button>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <span class="field-label" id="date-label">Date</span>
+    <div class="date-row">
+      <input type="date" id="date-start">
+      <span class="date-sep" id="date-sep" style="display:none">au</span>
+      <input type="date" id="date-end" style="display:none">
+    </div>
+  </div>
+
+  <div class="ctrl-divider"></div>
+
+  <div class="field-group">
+    <span class="field-label">Remplaçante</span>
+    <input type="text" id="remplacante" placeholder="Nom de la remplaçante">
+  </div>
+
+</div>
+
+<!-- TABLE -->
 <div class="main-card">
   <div class="table-wrapper">
     <table id="main-table">
       <thead>
-        <tr>
-          <th style="width:30px"></th>
+        <!-- Group labels -->
+        <tr class="col-group-header">
+          <th style="width:36px; border-right:1px solid var(--border);"></th>
+          <th class="grp-identity" colspan="1">Identité</th>
+          <th class="grp-input" colspan="2">Saisie</th>
+          <th class="grp-calc" colspan="3">Calculs automatiques</th>
+        </tr>
+        <!-- Column names -->
+        <tr class="col-headers">
+          <th></th>
           <th>Patient</th>
-          <th>BSI + IFI (€)</th>
-          <th>Déplacements</th>
-          <th>Total Dépl. (€)</th>
-          <th class="col-accent">BSI − Déplac (€)</th>
-          <th class="col-accent">5%</th>
+          <th class="col-input-h">BSI + IFI (€)</th>
+          <th class="col-input-h">Déplacements</th>
+          <th class="col-calc-h">Total Dépl. (€)</th>
+          <th class="col-calc-h">BSI &minus; Déplac (€)</th>
+          <th class="col-calc-h">5%</th>
         </tr>
       </thead>
       <tbody id="table-body"></tbody>
       <tr class="add-row-row">
         <td colspan="7">
-          <button class="btn-add" onclick="addRow()">＋ Ajouter un patient</button>
+          <button class="btn-add" onclick="addRow()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter un patient
+          </button>
         </td>
       </tr>
       <tfoot>
         <tr class="totals-row">
           <td></td>
-          <td class="total-label">TOTAL</td>
+          <td class="total-label">Total</td>
           <td class="total-val computed" id="total-bsi">0,00 €</td>
           <td></td>
           <td class="total-val computed" id="total-deplac">0,00 €</td>
@@ -380,11 +552,14 @@
           <td class="total-pct" id="total-pct">0,00 €</td>
         </tr>
         <tr class="final-row">
-          <td colspan="5"></td>
-          <td class="final-label">À PAYER</td>
-          <td>
+          <td class="final-spacer" colspan="4"></td>
+          <td class="final-spacer final-label-cell">
+            <span class="final-label">À Payer</span>
+            <span class="final-sublabel">BSI+IFI &minus; 5% + Dépl.</span>
+          </td>
+          <td class="final-amount-cell" colspan="2">
             <span class="final-val" id="total-final">0,00 €</span>
-            <span class="final-formula">BSI+IFI − 5% + Déplacements &nbsp;·&nbsp; valeurs tronquées au centime, non arrondies</span>
+            <span class="final-note">Valeurs tronquées au centime, non arrondies</span>
           </td>
         </tr>
       </tfoot>
@@ -392,19 +567,32 @@
   </div>
 </div>
 
+<!-- ACTIONS -->
 <div class="actions-bar">
-  <button class="btn btn-import" onclick="document.getElementById('import-input').click()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    Importer CSV
-  </button>
-  <input type="file" id="import-input" accept=".csv" style="display:none" onchange="importCSV(event)">
-  <button class="btn btn-pdf" onclick="exportPDF()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    Exporter PDF
-  </button>
+  <div class="actions-left">
+    <button class="btn btn-import" onclick="document.getElementById('import-input').click()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Importer CSV
+    </button>
+    <input type="file" id="import-input" accept=".csv" style="display:none" onchange="importCSV(event)">
+    <button class="btn btn-export" onclick="exportCSV()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exporter CSV
+    </button>
+  </div>
+  <div class="actions-right">
+    <button class="btn btn-pdf" onclick="exportPDF()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Exporter PDF
+    </button>
+  </div>
 </div>
 
+<p id="update-label" style="max-width:1160px; margin: 14px auto 0; text-align:right; font-size:0.65rem; color:var(--muted); letter-spacing:0.04em;"></p>
+
 <script>
+  document.getElementById('update-label').textContent =
+    'Mis à jour le ' + new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
   const DEPLAC_UNIT = 2.75;
   let rowCount = 0;
   let currentMode = 'single';
@@ -461,10 +649,10 @@
     const tr = document.createElement('tr');
     tr.dataset.id = rowCount;
     tr.innerHTML = `
-      <td><button class="delete-btn" onclick="removeRow(${rowCount})" title="Supprimer">\xd7</button></td>
-      <td><input type="text" placeholder="Nom du patient" onchange="recalc()"></td>
-      <td><input type="number" step="0.01" min="0" placeholder="0,00" oninput="recalc()"></td>
-      <td><input type="number" step="1" min="0" placeholder="0" oninput="recalc()"></td>
+      <td><button class="delete-btn" onclick="removeRow(${rowCount})" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>
+      <td><input type="text" placeholder="Nom du patient" oninput="recalc()"></td>
+      <td class="td-input"><input type="number" step="0.01" min="0" placeholder="0,00" oninput="recalc()"></td>
+      <td class="td-input"><input type="number" step="1" min="0" placeholder="0" oninput="recalc()"></td>
       <td class="computed" id="td-dep-${rowCount}">\u2014</td>
       <td class="computed" id="td-net-${rowCount}">\u2014</td>
       <td class="computed col-pct" id="td-pct-${rowCount}">\u2014</td>
@@ -491,8 +679,8 @@
       const nb  = parseFloat(ins[1].value) || 0;
       const dep = nb * DEPLAC_UNIT;
       const net = bsi - dep;
-      // 5% seulement si déplacements renseignés (nb > 0)
-      const pct = nb > 0 ? net * 0.05 : 0;
+      // 5% sur (BSI - déplacements) si déplacements > 0, sinon 5% sur BSI directement
+      const pct = nb > 0 ? net * 0.05 : bsi * 0.05;
 
       document.getElementById(`td-dep-${id}`).textContent = nb > 0 ? fmt(dep) : '\u2014';
 
@@ -501,7 +689,7 @@
       netEl.className   = 'computed' + (net < 0 ? ' negative' : net > 0 ? ' positive' : '');
 
       const pctEl = document.getElementById(`td-pct-${id}`);
-      pctEl.textContent = nb > 0 ? fmt(pct) : '\u2014';
+      pctEl.textContent = bsi > 0 ? fmt(pct) : '\u2014';
 
       totalBSI    += bsi;
       totalDeplac += dep;
@@ -535,20 +723,20 @@
     ];
 
     rows.forEach(tr => {
-      const ins     = tr.querySelectorAll('input');
-      const patient = ins[0].value || '';
-      const bsi     = parseFloat(ins[1].value) || 0;
-      const nb      = parseFloat(ins[2].value) || 0;
+      const ins     = tr.querySelectorAll('input[type="number"]');
+      const patient = tr.querySelector('input[type="text"]').value || '';
+      const bsi     = parseFloat(ins[0].value) || 0;
+      const nb      = parseFloat(ins[1].value) || 0;
       const dep     = nb * DEPLAC_UNIT;
       const net     = bsi - dep;
-      const pct     = net * 0.05;
+      const pct     = nb > 0 ? net * 0.05 : bsi * 0.05;
       lines.push([
         `"${patient}"`,
         fmtRaw(bsi),
         nb,
         fmtRaw(dep),
         fmtRaw(net),
-        nb > 0 ? fmtRaw(pct) : ''
+        bsi > 0 ? fmtRaw(pct) : ''
       ].join(';'));
     });
 
@@ -617,10 +805,13 @@
         if (!headerFound) continue;
         if (!cols[0] || cols[0] === 'TOTAL' || cols[0].startsWith('A PAYER')) continue;
 
-        // Data row: Patient ; BSI ; nb_deplac ; total_deplac ; net ; pct
+        // Data row: Patient ; BSI ; nb_deplac ; ...
         const patient = cols[0].replace(/^"|"$/g, '');
-        const bsi     = parseFloat((cols[1] || '0').replace(',', '.')) || 0;
-        const nb      = parseFloat((cols[2] || '0').replace(',', '.')) || 0;
+        // skip legacy 'Couple' column if present
+        let bsiIdx = 1;
+        if (cols[1] === 'Oui' || cols[1] === 'Non') bsiIdx = 2;
+        const bsi = parseFloat((cols[bsiIdx] || '0').replace(',', '.')) || 0;
+        const nb  = parseFloat((cols[bsiIdx + 1] || '0').replace(',', '.')) || 0;
         if (patient || bsi || nb) dataRows.push({ patient, bsi, nb });
       }
 
@@ -653,19 +844,19 @@
           const tr = document.createElement('tr');
           tr.dataset.id = rowCount;
           tr.innerHTML = `
-            <td><button class="delete-btn" onclick="removeRow(${rowCount})" title="Supprimer">\xd7</button></td>
-            <td><input type="text" placeholder="Nom du patient" onchange="recalc()"></td>
-            <td><input type="number" step="0.01" min="0" placeholder="0,00" oninput="recalc()"></td>
-            <td><input type="number" step="1" min="0" placeholder="0" oninput="recalc()"></td>
+            <td><button class="delete-btn" onclick="removeRow(${rowCount})" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>
+            <td><input type="text" placeholder="Nom du patient" oninput="recalc()"></td>
+            <td class="td-input"><input type="number" step="0.01" min="0" placeholder="0,00" oninput="recalc()"></td>
+            <td class="td-input"><input type="number" step="1" min="0" placeholder="0" oninput="recalc()"></td>
             <td class="computed" id="td-dep-${rowCount}">\u2014</td>
             <td class="computed" id="td-net-${rowCount}">\u2014</td>
             <td class="computed col-pct" id="td-pct-${rowCount}">\u2014</td>
           `;
           tbody.appendChild(tr);
-          const ins = tr.querySelectorAll('input');
-          ins[0].value = patient;
-          ins[1].value = bsi || '';
-          ins[2].value = nb  || '';
+          const ins = tr.querySelectorAll('input[type="number"]');
+          tr.querySelector('input[type="text"]').value = patient;
+          ins[0].value = bsi || '';
+          ins[1].value = nb  || '';
         });
         recalc();
       }
@@ -683,13 +874,13 @@
 
     const dataRows = [];
     rows.forEach(tr => {
-      const ins     = tr.querySelectorAll('input');
-      const patient = ins[0].value || '';
-      const bsi     = parseFloat(ins[1].value) || 0;
-      const nb      = parseFloat(ins[2].value) || 0;
+      const ins     = tr.querySelectorAll('input[type="number"]');
+      const patient = tr.querySelector('input[type="text"]').value || '';
+      const bsi     = parseFloat(ins[0].value) || 0;
+      const nb      = parseFloat(ins[1].value) || 0;
       const dep     = nb * DEPLAC_UNIT;
       const net     = bsi - dep;
-      const pct     = nb > 0 ? net * 0.05 : null;
+      const pct     = nb > 0 ? net * 0.05 : bsi * 0.05;
       if (patient || bsi || nb) dataRows.push({ patient, bsi, nb, dep, net, pct });
     });
 
@@ -706,7 +897,7 @@
         <td style="text-align:center">${r.nb || '—'}</td>
         <td>${r.nb > 0 ? fmt(r.dep) : '—'}</td>
         <td>${(r.bsi > 0 || r.nb > 0) ? fmt(r.net) : '—'}</td>
-        <td>${r.pct !== null ? fmt(r.pct) : '—'}</td>
+        <td>${r.bsi > 0 ? fmt(r.pct) : '—'}</td>
       </tr>`).join('');
 
     const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
@@ -750,7 +941,7 @@
           <td>${tDeplac}</td><td>${tNet}</td><td>${tPct}</td>
         </tr>
         <tr class="t2">
-          <td colspan="4"></td>
+          <td colspan="3"></td>
           <td class="final-lbl">À PAYER</td>
           <td class="final-amt">${tFinal}</td>
         </tr>
